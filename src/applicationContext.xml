@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+           
+	
+
+	<context:property-placeholder location="classpath:jdbc.properties"/>
+
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="${jdbc.driver}"/>
+		<property name="jdbcUrl" value="${jdbc.url}"/>
+		<property name="user" value="${jdbc.user}"/>
+		<property name="password" value="${jdbc.password}"/>
+	</bean>
+	
+
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.connection.autocommit">false</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+			</props>
+		</property>
+		<property name="mappingResources">
+			<list>
+				<value>cn/cdcas/edu/user/vo/User.hbm.xml</value>
+				<value>cn/cdcas/edu/category/vo/Category.hbm.xml</value>
+				<value>cn/cdcas/edu/product/vo/Product.hbm.xml</value>
+				<value>cn/cdcas/edu/categorysecond/vo/CategorySecond.hbm.xml</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+	
+
+	<bean id="indexAction" class="cn.cdcas.edu.index.action.IndexAction" scope="prototype">
+		<property name="categoryService" ref="categoryService"/>
+		<property name="productService" ref="productService"/>
+	</bean>
+	
+	<bean id="checkImgAction" class="cn.cdcas.edu.user.action.CheckImgAction" scope="prototype">
+		
+	</bean>
+	
+	<bean id="userAction" class="cn.cdcas.edu.user.action.UserAction" scope="prototype">
+		<property name="userService" ref="userService"/>
+	</bean>
+	
+	<bean id="productAction" class="cn.cdcas.edu.product.action.ProductAction" scope="prototype">
+		<property name="productService" ref="productService"/>
+	</bean>
+	
+	<bean id="cartAction" class="cn.cdcas.edu.cart.action.CartAction" scope="prototype">
+		<property name="productService" ref="productService"/>
+	</bean>
+	
+	
+	
+	<bean id="userService" class="cn.cdcas.edu.user.service.UserService">
+		<property name="userDao" ref="userDao"/>
+	</bean>
+	
+	<bean id="categoryService" class="cn.cdcas.edu.category.service.CategoryService">
+		<property name="categoryDao" ref="categoryDao"/>
+	</bean>
+	
+	<bean id="productService" class="cn.cdcas.edu.product.service.ProductService">
+		<property name="productDao" ref="productDao"/>
+	</bean>
+	
+	
+	
+	
+	<bean id="userDao" class="cn.cdcas.edu.user.dao.UserDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="categoryDao" class="cn.cdcas.edu.category.dao.CategoryDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>	
+	
+	<bean id="productDao" class="cn.cdcas.edu.product.dao.ProductDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+</beans>
